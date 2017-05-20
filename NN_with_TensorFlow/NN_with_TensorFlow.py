@@ -4,6 +4,9 @@ import tensorflow as tf
 
 root = os.path.dirname(__file__)
 
+# TensorBoardログ出力
+writer = tf.summary.FileWriter("tmp/log/NN_with_TensorFlow") # <-- 出力先フォルダ（実行するたびにこのフォルダ以下にファイルが生成される
+
 #mnistデータ取得
 mnist = input_data.read_data_sets(os.path.join(root, "data"), one_hot=True)
 
@@ -45,4 +48,11 @@ print(mnist.test.labels[0])
 # 学習済みモデルの正解率
 correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+
+# 各テンソルにはgraphというプロパティが存在するので、これをwriter経由で書き出すと、
+# tensorboard上で見えるようになる。
+# tensorboardの起動はコマンドプロンプトにて tensorboard --logdir=tmp/log で起動できる
+# （カレントディレクトリは本プロジェクトルートフォルダとする）
+writer.add_graph(accuracy.graph)
+
 print(accuracy.eval({x:mnist.test.images, y_:mnist.test.labels}))
